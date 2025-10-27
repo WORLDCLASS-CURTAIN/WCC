@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>World Class Curtain - Sign Up</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <link rel="icon" href="logoo.png" type="image/png" />
+  <style>
+    .hero {
+      position: sticky;
+      overflow: hidden;
+      transition: background-image 1s ease-in-out;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1;
+    }
+    .hero h2, .hero p, .hero button {
+      z-index: 2;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+    }
+    .hero button:hover {
+      background-color: rgba(26, 27, 75, 0.8);
+      transform: scale(1.05);
+    }
+    nav {
+      position: sticky;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 10;
+    }
+    body {
+      margin-top: 4rem;
+    }
+    .fade-in {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+    }
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    const SUPABASE_URL = 'https://xyvqvcfdkvvbagqxygwo.supabase.co'
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh5dnF2Y2Zka3Z2YmFncXh5Z3dvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc3NTAzMjUsImV4cCI6MjA3MzMyNjMyNX0.y9mp2CwTpmBfeu03iQx_2khV2F3SD_xhFTih3WMoMMA'
+    
+    // Correctly initialize the Supabase client
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+    // Share the client instance with other scripts
+    window.supabase = supabaseClient
+  </script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            'playfair': ['"Playfair Display"', 'serif'],
+            'poppins': ['Poppins', 'sans-serif']
+          },
+          colors: {
+            'primary': '#1a1b4b',
+            'secondary': '#e6f3ff'
+          }
+        }
+      }
+    }
+
+    function toggleMenu() {
+      document.getElementById('mobile-menu').classList.toggle('hidden');
+    }
+
+    function smoothScroll(target) {
+      document.querySelector(target)?.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    const images = ['bigi1.jpg', 'bigi2.jpg', 'bigi3.jpg'];
+    let currentIndex = 0;
+    function changeBackground() {
+      const heroSection = document.querySelector('.hero');
+      if (heroSection) {
+        currentIndex = (currentIndex + 1) % images.length;
+        heroSection.style.backgroundImage = `url('${images[currentIndex]}')`;
+      }
+    }
+    setInterval(changeBackground, 5000);
+
+    function handleScroll() {
+      const elements = document.querySelectorAll('.fade-in');
+      const windowHeight = window.innerHeight;
+      elements.forEach(element => {
+        const elementTop = element.getBoundingClientRect().top;
+        if (elementTop < windowHeight - 50) {
+          element.classList.add('visible');
+        }
+      });
+    }
+
+    window.addEventListener('scroll', handleScroll);
+    document.addEventListener('DOMContentLoaded', handleScroll);
+  </script>
+</head>
+<body class="font-poppins">
+
+  <nav class="bg-white py-4 px-6 md:px-12 shadow-md">
+    <div class="container mx-auto flex justify-between items-center">
+      <a href="index.html" class="flex items-center text-2xl font-playfair font-bold text-primary">
+        <img src="logoo.png" alt="Logo" class="h-10 mr-2"> World Class Curtain
+      </a>
+      <div class="md:hidden">
+        <img src="menuuu.png" alt="Menu" class="menu-btn cursor-pointer" onclick="toggleMenu()" />
+      </div>
+      <div class="hidden md:flex space-x-8">
+        <a href="index.html" class="hover:text-primary">HOME</a>
+        <a href="seemore.html" class="hover:text-primary">MORE</a>
+        <a href="#about" class="hover:text-primary" onclick="smoothScroll('#about')">ABOUT</a>
+        <a href="contact.html" class="hover:text-primary">CONTACT</a>
+        <a href="developers.html" class="hover:text-primary">DEVELOPERS</a>
+        <a href="Research.html" class="hover:text-primary">RESEARCH</a>
+      </div>
+    </div>
+    <div id="mobile-menu" class="hidden md:hidden bg-white py-4 px-6">
+      <a href="index.html" class="block hover:text-primary">HOME</a>
+      <a href="seemore.html" class="block hover:text-primary">MORE</a>
+      <a href="#about" class="block hover:text-primary" onclick="smoothScroll('#about')">ABOUT</a>
+      <a href="contact.html" class="block hover:text-primary">CONTACT</a>
+      <a href="developers.html" class="block hover:text-primary">DEVELOPERS</a>
+      <a href="Research.html" class="block hover:text-primary">RESEARCH</a>
+    </div>
+  </nav>
+
+  <section class="hero bg-secondary py-16 md:py-24 bg-cover bg-center" style="background-image: url('bigi1.jpg');"></section>
+
+  <section id="signup" class="py-16 bg-secondary fade-in">
+    <div class="container mx-auto px-6 md:px-12 flex justify-center">
+      <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-md">
+        <h2 class="text-3xl font-playfair font-bold text-primary text-center mb-6">Create an Account</h2>
+        <form id="signup-form">
+          <div class="mb-4">
+            <label for="signup-name" class="block text-gray-700 font-medium mb-2">Full Name</label>
+            <input type="text" id="signup-name" name="name" class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" placeholder="John Doe" required />
+          </div>
+          <div class="mb-4">
+            <label for="signup-email" class="block text-gray-700 font-medium mb-2">Email Address</label>
+            <input type="email" id="signup-email" name="email" class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" placeholder="you@example.com" required />
+          </div>
+          <div class="mb-6">
+            <label for="signup-password" class="block text-gray-700 font-medium mb-2">Password</label>
+            <input type="password" id="signup-password" name="password" class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" placeholder="••••••••" required />
+          </div>
+            <button type="submit" class="w-full bg-primary text-white py-3 rounded-md hover:bg-opacity-90 transition-colors duration-300 font-semibold">
+            Sign Up
+          </button>
+        </form>
+        <p class="text-center text-gray-600 mt-6">
+          Already have an account?
+          <a href="login.html" class="text-primary font-medium hover:underline">Sign in</a>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="bg-primary text-white py-12 text-center">
+    <p>&copy; 2025 World Class Curtain. All rights reserved.</p>
+  </footer>
+
+  <script type="module">
+    const supabase = window.supabase;
+    const signupForm = document.getElementById('signup-form');
+
+    if (signupForm) {
+      signupForm.addEventListener('submit', async function (event) {
+        event.preventDefault();
+
+        const name = document.getElementById('signup-name').value;
+        const email = document.getElementById('signup-email').value;
+        const password = document.getElementById('signup-password').value;
+
+        // Sign up the user and pass their name as metadata
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: {
+              full_name: name 
+            }
+          }
+        });
+
+        if (error) {
+          alert('Sign up failed: ' + error.message);
+          return;
+        }
+
+        // The profile will be created automatically by the database trigger.
+        alert('Sign up successful! Please check your email to confirm your account.');
+        window.location.href = 'registration_successful.html';
+      });
+    }
+  </script>
+</body>
+</html>

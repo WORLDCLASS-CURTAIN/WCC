@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>World Class Curtain - Contact</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500;600&display.swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="icon" href="logoo.png" type="image/png">
+    
+    <style>
+        /* Styles from index.html */
+        .hero { position: relative; overflow: hidden; transition: background-image 1s ease-in-out; background-size: cover; background-position: center; }
+        .hero::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); z-index: 1; }
+        .hero h2, .hero p, .hero button { position: relative; z-index: 2; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7); }
+        nav { position: sticky; top: 0; left: 0; right: 0; z-index: 1000; }
+        .fade-in { opacity: 0; transform: translateY(20px); transition: opacity 0.5s ease-out, transform 0.5s ease-out; }
+        .fade-in.visible { opacity: 1; transform: translateY(0); }
+    </style>
+
+    <script type="module">
+        import { createClient } from 'https://esm.sh/@supabase/supabase-js'
+        const SUPABASE_URL = 'https://xyvqvcfdkvvbagqxygwo.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh5dnF2Y2Zka3Z2YmFncXh5Z3dvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc3NTAzMjUsImV4cCI6MjA3MzMyNjMyNX0.y9mp2CwTpmBfeu03iQx_2khV2F3SD_xhFTih3WMoMMA';
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        window.supabase = supabase;
+    </script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { 'playfair': ['"Playfair Display"', 'serif'], 'poppins': ['Poppins', 'sans-serif'] },
+                    colors: { 'primary': '#1a1b4b', 'secondary': '#e6f3ff' }
+                }
+            }
+        };
+
+        function toggleMenu() { document.getElementById('mobile-menu').classList.toggle('hidden'); }
+        
+        // Background Image Rotation (from contact.html)
+        const images = ['bigi1.jpg', 'bigi2.jpg', 'bigi3.jpg'];
+        let currentIndex = 0;
+        function changeBackground() {
+            const heroSection = document.querySelector('.hero');
+            if (heroSection) {
+                currentIndex = (currentIndex + 1) % images.length;
+                heroSection.style.backgroundImage = `url('${images[currentIndex]}')`;
+            }
+        }
+        
+        // Scroll Animation (from index.html)
+        function handleScroll() {
+            const elements = document.querySelectorAll('.fade-in');
+            const windowHeight = window.innerHeight;
+            elements.forEach(element => {
+                const elementTop = element.getBoundingClientRect().top;
+                if (elementTop < windowHeight - 50) {
+                    element.classList.add('visible');
+                }
+            });
+        }
+        
+        // Initial calls and Event Listeners
+        window.addEventListener('scroll', handleScroll);
+        setInterval(changeBackground, 5000); 
+
+        document.addEventListener('DOMContentLoaded', () => {
+            handleScroll(); // Check scroll position on load
+            
+            // Attach mobile menu click listener
+            const menuBtn = document.getElementById('menu-btn');
+            if (menuBtn) {
+                menuBtn.addEventListener('click', toggleMenu);
+            }
+        });
+    </script>
+</head>
+<body class="font-poppins bg-gray-50"> <nav class="bg-white py-4 px-6 md:px-12 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <a href="index.html" class="flex items-center text-2xl font-playfair font-bold text-primary">
+                <img src="logoo.png" alt="World Class Curtain Logo" class="h-10 mr-2">
+                World Class Curtain
+            </a>
+            
+            <div class="flex items-center space-x-4 md:hidden">
+                <a href="cart.html" class="hover:text-primary relative">
+                    <i class="fas fa-shopping-cart text-xl"></i>
+                    <span id="cart-item-count-mobile" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                </a>
+                <div class="">
+                    <img src="menuuu.png" alt="Menu Button" class="menu-btn cursor-pointer h-8 w-8" id="menu-btn">
+                </div>
+            </div>
+            <div class="hidden md:flex space-x-8 items-center">
+                <a href="index.html" class="hover:text-primary">HOME</a>
+                <a href="inquiries.html" class="hover:text-primary">INQUIRIES</a>
+                <a href="accesories.html" class="hover:text-primary">ACCESSORIES</a>
+                <a href="seemore.html" class="hover:text-primary">MORE</a>
+                <a href="contact.html" class="hover:text-primary">CONTACT</a>
+                <div id="auth-links" class="flex space-x-4 items-center"></div> 
+                
+                <a href="cart.html" class="hover:text-primary relative">
+                    <i class="fas fa-shopping-cart text-xl"></i>
+                    <span id="cart-item-count-desktop" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                </a>
+            </div>
+        </div>
+        <div id="mobile-menu" class="hidden md:hidden bg-white py-4 px-6">
+            <a href="index.html" class="block hover:text-primary py-2">HOME</a>
+            <a href="inquiries.html" class="hover:text-primary">INQUIRIES</a>
+            <a href="accesories.html" class="hover:text-primary">ACCESSORIES</a>
+            <a href="seemore.html" class="block hover:text-primary py-2">MORE</a>
+            <a href="contact.html" class="block hover:text-primary py-2">CONTACT</a>
+            <div id="mobile-auth-links" class="mt-2 space-y-1"></div> 
+        </div>
+    </nav>
+
+    <section id="user-welcome" class="hidden py-8 bg-secondary fade-in text-center">
+        <h2 class="text-2xl font-playfair font-bold text-primary">Welcome Back!</h2>
+        <p id="user-email-display" class="text-gray-600"></p>
+    </section>
+
+    <section class="hero bg-secondary py-16 md:py-24 bg-cover bg-center" style="background-image: url('bigi1.jpg');">
+        <div class="container mx-auto px-6 md:px-12">
+            <div class="max-w-2xl relative z-10">
+                <h2 class="text-4xl md:text-5xl font-playfair font-bold text-white mb-4">Curtains That<br/>Reflect your Style</h2>
+                <p class="text-white mb-8">Explore The Elegance of World - Class<br/>Curtains, where Luxury Meets<br/>Functionality.</p>
+                <button class="bg-primary text-white px-8 py-3 rounded hover:bg-opacity-90 transition" onclick="window.location.href='seemore.html'">
+                    Explore Now
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-16 bg-white fade-in"> <div class="container mx-auto px-6 md:px-12">
+            <h2 class="text-3xl font-playfair font-bold text-primary text-center mb-4">Contact Us</h2>
+            <p class="text-center text-gray-600 mb-8">We would love to hear from you! Please reach out with any questions or inquiries.</p>
+            
+            <div class="max-w-md mx-auto bg-white p-6 rounded-lg shadow-lg"> <h3 class="text-xl font-bold mb-4">Contact Information</h3>
+                <p class="mb-2"><strong>Name:</strong> Miralyn Tarasona</p>
+                <p class="mb-2"><strong>Contact Number(Globe):</strong> +63 9952542853</p>
+                <p class="mb-2"><strong>Contact Number(TNT):</strong>  +63 9095896373</p>
+                <p class="mb-2"><strong>Email:</strong> tarasonamira@gmail.com</p>
+                <p class="mb-2"><strong>Address:</strong>  Isla Pulang Bato Bagong Silangan Quezon City</p>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-primary text-white py-12">
+        <div class="container mx-auto px-6 md:px-12">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="font-playfair text-xl font-bold mb-4">World Class Curtain</h3>
+                    <p class="text-gray-300">Elevate your space with our premium collection of curtains designed for modern living.</p>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-4">Quick Links</h4>
+                    <ul class="space-y-2">
+                        <li><a href="index.html" class="text-gray-300 hover:text-white">Home</a></li>
+                        <li><a href="inquiries.html" class="text-gray-300 hover:text-white">Inquiries</a></li>
+                        <li><a href="accesories.html" class="text-gray-300 hover:text-white">Accessories</a></li>
+                        <li><a href="seemore.html" class="text-gray-300 hover:text-white">More</a></li>
+                        <li><a href="contact.html" class="text-gray-300 hover:text-white">Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-300">
+                <p>&copy; 2025 World Class Curtain. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script type="module">
+        const supabase = window.supabase;
+
+        // 🔑 OWNER CONFIGURATION - From index.html
+        const OWNER_USER_ID = 'a07429ce-d43a-4c8f-aedf-07e06dd4ca64'; 
+
+        // --- DOM Selectors ---
+        const authLinksContainer = document.getElementById('auth-links');
+        const mobileAuthLinksContainer = document.getElementById('mobile-auth-links');
+        const userWelcomeSection = document.getElementById('user-welcome');
+        const userEmailDisplay = document.getElementById('user-email-display');
+        const cartItemCountDesktop = document.getElementById('cart-item-count-desktop'); 
+        const cartItemCountMobile = document.getElementById('cart-item-count-mobile'); 
+
+        // --- Authentication ---
+        async function checkUserSession() {
+            const { data: { session } } = await supabase.auth.getSession();
+            updateUIAfterAuth(session);
+            updateCartCount(session);
+        }
+
+        function updateUIAfterAuth(session) {
+            authLinksContainer.innerHTML = ''; 
+            mobileAuthLinksContainer.innerHTML = '';
+            
+            const isOwner = session && session.user.id === OWNER_USER_ID;
+
+            if (session && session.user) {
+                // User is logged in
+                userWelcomeSection.classList.remove('hidden');
+                userEmailDisplay.textContent = `Signed in as: ${session.user.email}`;
+
+                let adminLinkDesktop = isOwner ? `<a href="admin_orders.html" class="hover:text-red-600 font-bold text-red-500">ADMIN ORDERS</a>` : '';
+                const desktopLinks = `
+                    ${adminLinkDesktop}
+                    <a href="profile.html" class="hover:text-primary font-semibold">PROFILE</a>
+                    <button id="signout-btn" class="hover:text-primary font-semibold">SIGN OUT</button>
+                `;
+                
+                let adminLinkMobile = isOwner ? `<a href="admin_orders.html" class="block hover:text-red-600 py-2 font-bold text-red-500">ADMIN ORDERS</a>` : '';
+                const mobileLinks = `
+                    ${adminLinkMobile}
+                    <a href="profile.html" class="block hover:text-primary py-2">PROFILE</a>
+                    <button id="mobile-signout-btn" class="block hover:text-primary py-2 w-full text-left">SIGN OUT</button>
+                `;
+                
+                authLinksContainer.innerHTML = desktopLinks;
+                mobileAuthLinksContainer.innerHTML = mobileLinks;
+                
+                document.getElementById('signout-btn').addEventListener('click', handleSignOut);
+                document.getElementById('mobile-signout-btn').addEventListener('click', handleSignOut);
+
+            } else {
+                // User is not logged in
+                userWelcomeSection.classList.add('hidden');
+                const desktopLinks = `<a href="login.html" class="hover:text-primary font-semibold">SIGN IN</a>`;
+                const mobileLinks = `<a href="login.html" class="block hover:text-primary py-2">SIGN IN</a>`;
+                authLinksContainer.innerHTML = desktopLinks;
+                mobileAuthLinksContainer.innerHTML = mobileLinks;
+            }
+        }
+
+        async function handleSignOut() {
+            await supabase.auth.signOut();
+            window.location.reload();
+        }
+        
+        // --- Cart Logic ---
+        async function updateCartCount(session) {
+            if (!session) {
+                if (cartItemCountDesktop) cartItemCountDesktop.textContent = '0';
+                if (cartItemCountMobile) cartItemCountMobile.textContent = '0';
+                return;
+            }
+            const { count, error } = await supabase
+                .from('cart')
+                .select('*', { count: 'exact', head: true })
+                .eq('user_id', session.user.id);
+            
+            const itemCount = error ? '0' : (count || '0');
+
+            if (cartItemCountDesktop) cartItemCountDesktop.textContent = itemCount;
+            if (cartItemCountMobile) cartItemCountMobile.textContent = itemCount;
+        }
+
+        // --- Event Listeners ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check user session on page load
+            checkUserSession();
+        });
+    </script>
+</body>
+</html>

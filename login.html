@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - World Class Curtain</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="icon" href="logoo.png" type="image/png">
+
+    <script type="module">
+        import { createClient } from 'https://esm.sh/@supabase/supabase-js'
+        const SUPABASE_URL = 'https://xyvqvcfdkvvbagqxygwo.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh5dnF2Y2Zka3Z2YmFncXh5Z3dvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc3NTAzMjUsImV4cCI6MjA3MzMyNjMyNX0.y9mp2CwTpmBfeu03iQx_2khV2F3SD_xhFTih3WMoMMA';
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        window.supabase = supabase; // Make it globally accessible
+    </script>
+
+    <script>
+        // Tailwind Customization
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'playfair': ['"Playfair Display"', 'serif'],
+                        'poppins': ['Poppins', 'sans-serif']
+                    },
+                    colors: {
+                        'primary': '#1a1b4b',
+                        'secondary': '#e6f3ff'
+                    }
+                }
+            }
+        };
+    </script>
+</head>
+<body class="font-poppins bg-secondary flex flex-col min-h-screen">
+
+    <header class="bg-white py-4 px-6 md:px-12 shadow-md">
+        <div class="container mx-auto">
+            <a href="index.html" class="flex items-center text-2xl font-playfair font-bold text-primary">
+                <img src="logoo.png" alt="World Class Curtain Logo" class="h-10 mr-2">
+                <span>World Class Curtain</span>
+            </a>
+        </div>
+    </header>
+
+    <main class="flex-grow container mx-auto flex items-center justify-center p-6">
+        <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-md">
+            
+            <h2 class="text-3xl font-playfair font-bold text-primary mb-6 text-center">
+                Welcome Back!
+            </h2>
+
+            <div class="flex border-b border-gray-200 mb-8">
+                <button id="tab-signin" class="flex-1 py-3 font-semibold text-lg text-primary border-b-2 border-primary transition-colors duration-200">Sign In</button>
+                <button id="tab-signup" class="flex-1 py-3 font-semibold text-lg text-gray-500 hover:text-gray-700 transition-colors duration-200">Create Account</button>
+            </div>
+
+            <div id="error-message" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-md mb-6 transition-all duration-300" role="alert"></div>
+            <div id="success-message" class="hidden bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-md mb-6 transition-all duration-300" role="alert"></div>
+
+            <form id="signin-form">
+                <div class="mb-5">
+                    <label for="signin-email" class="block text-sm text-gray-700 font-medium mb-2">Email Address</label>
+                    <input type="email" id="signin-email" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition duration-150" required />
+                </div>
+                <div class="mb-6">
+                    <label for="signin-password" class="block text-sm text-gray-700 font-medium mb-2">Password</label>
+                    <input type="password" id="signin-password" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition duration-150" required />
+                </div>
+                <button type="submit" class="w-full bg-primary text-white py-3.5 rounded-lg text-lg font-bold hover:bg-opacity-90 transition-all duration-300 shadow-lg hover:shadow-xl">
+                    Sign In
+                </button>
+                
+                <div class="mt-6 pt-4 border-t border-gray-100 text-center">
+                    <p class="text-gray-600 mb-3">
+                        Don't have an account?
+                    </p>
+                    <button type="button" id="go-to-signup" class="w-full text-primary border border-primary py-3 rounded-lg text-lg font-semibold hover:bg-secondary transition-all duration-300">
+                        Create Account
+                    </button>
+                </div>
+            </form>
+
+            <form id="signup-form" class="hidden">
+                <div class="mb-5">
+                    <label for="signup-email" class="block text-sm text-gray-700 font-medium mb-2">Email Address</label>
+                    <input type="email" id="signup-email" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition duration-150" required />
+                </div>
+                <div class="mb-6">
+                    <label for="signup-password" class="block text-sm text-gray-700 font-medium mb-2">Password</label>
+                    <input type="password" id="signup-password" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition duration-150" placeholder="Minimum 6 characters" required />
+                </div>
+                <button type="submit" class="w-full bg-primary text-white py-3.5 rounded-lg text-lg font-bold hover:bg-opacity-90 transition-all duration-300 shadow-lg hover:shadow-xl">
+                    Register & Confirm
+                </button>
+                
+                <div class="mt-6 pt-4 border-t border-gray-100 text-center">
+                    <p class="text-gray-600 mb-3">
+                        Already have an account?
+                    </p>
+                    <button type="button" id="go-to-signin" class="w-full text-primary border border-primary py-3 rounded-lg text-lg font-semibold hover:bg-secondary transition-all duration-300">
+                        Go to Sign In
+                    </button>
+                </div>
+            </form>
+
+        </div>
+    </main>
+
+    <footer class="bg-primary text-white py-12">
+        <div class="container mx-auto px-6 md:px-12">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="font-playfair text-xl font-bold mb-4">World Class Curtain</h3>
+                    <p class="text-gray-300">Elevate your space with our premium collection of curtains designed for modern living.</p>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-4">Quick Links</h4>
+                    <ul class="space-y-2">
+                        <li><a href="index.html" class="text-gray-300 hover:text-white">Home</a></li>
+                        <li><a href="accesories.html" class="text-gray-300 hover:text-white">Accessories</a></li>
+                        <li><a href="seemore.html" class="text-gray-300 hover:text-white">More</a></li>
+                        <li><a href="contact.html" class="text-gray-300 hover:text-white">Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-300">
+                <p>&copy; 2025 World Class Curtain. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script type="module">
+        const supabase = window.supabase;
+
+        // DOM Elements
+        const tabSignin = document.getElementById('tab-signin');
+        const tabSignup = document.getElementById('tab-signup');
+        const signinForm = document.getElementById('signin-form');
+        const signupForm = document.getElementById('signup-form');
+        const errorMessageDiv = document.getElementById('error-message');
+        const successMessageDiv = document.getElementById('success-message');
+
+        // New Buttons
+        const goToSignupButton = document.getElementById('go-to-signup');
+        const goToSigninButton = document.getElementById('go-to-signin');
+
+
+        /**
+         * Displays a message in the designated error or success div.
+         */
+        function showMessage(message, type = 'error') {
+            const div = type === 'error' ? errorMessageDiv : successMessageDiv;
+            
+            errorMessageDiv.classList.add('hidden');
+            successMessageDiv.classList.add('hidden');
+            
+            div.textContent = message;
+            div.classList.remove('hidden');
+        }
+
+        /**
+         * Switches between the Sign In and Sign Up tabs and updates the UI.
+         */
+        function switchTab(target) {
+            errorMessageDiv.classList.add('hidden');
+            successMessageDiv.classList.add('hidden');
+
+            if (target === 'signin') {
+                signinForm.classList.remove('hidden');
+                signupForm.classList.add('hidden');
+
+                tabSignin.classList.add('text-primary', 'border-primary');
+                tabSignin.classList.remove('text-gray-500'); 
+                
+                tabSignup.classList.remove('text-primary', 'border-primary');
+                tabSignup.classList.add('text-gray-500');
+            } else { // target === 'signup'
+                signupForm.classList.remove('hidden');
+                signinForm.classList.add('hidden');
+                
+                tabSignup.classList.add('text-primary', 'border-primary');
+                tabSignup.classList.remove('text-gray-500');
+                
+                tabSignin.classList.remove('text-primary', 'border-primary');
+                tabSignin.classList.add('text-gray-500');
+            }
+        }
+        
+        // Initial setup
+        switchTab('signin'); 
+
+        // Tab switching event listeners
+        tabSignin.addEventListener('click', () => switchTab('signin'));
+        tabSignup.addEventListener('click', () => switchTab('signup'));
+        
+        // Button switching event listeners
+        goToSignupButton.addEventListener('click', () => switchTab('signup'));
+        goToSigninButton.addEventListener('click', () => switchTab('signin'));
+        
+        // ------------------------------------------------------------------
+        // Supabase Authentication Handlers
+        // ------------------------------------------------------------------
+
+        // Sign In Handler - FIXED for unconfirmed users
+        signinForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('signin-email').value;
+            const password = document.getElementById('signin-password').value;
+            
+            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
+            if (error) {
+                if (error.message.includes('Email not confirmed')) {
+                    showMessage('Login Failed: Your email has not been confirmed. Please check your inbox for the confirmation link.', 'error');
+                } else if (error.message.includes('Invalid login credentials')) {
+                    showMessage('Invalid email or password. Please double-check your credentials.', 'error');
+                } else {
+                    showMessage(`Login Failed: ${error.message}`, 'error');
+                }
+            } else {
+                showMessage('Login successful! Redirecting to the homepage...', 'success');
+                // Clear fields on success
+                document.getElementById('signin-email').value = '';
+                document.getElementById('signin-password').value = '';
+                setTimeout(() => window.location.href = 'index.html', 1500);
+            }
+        });
+
+        // Sign Up Handler - FIXED to prompt for email confirmation
+        signupForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-password').value;
+
+            const { data, error } = await supabase.auth.signUp({ email, password });
+            
+            if (error) {
+                if (error.message.includes('Password should be at least 6 characters')) {
+                     showMessage('Registration Failed: Password must be at least 6 characters long.', 'error');
+                } else if (error.message.includes('User already registered')) {
+                    showMessage('This email is already registered. Please sign in.', 'error');
+                } else {
+                    showMessage(`Registration Failed: ${error.message}`, 'error');
+                }
+            } else {
+                // User must confirm email before login. Do not redirect.
+                showMessage('Success! Please check your email inbox to confirm your account before signing in.', 'success');
+                
+                // Clear the form fields after success
+                document.getElementById('signup-email').value = '';
+                document.getElementById('signup-password').value = '';
+
+                // Switch the user back to the Sign In tab after a delay
+                setTimeout(() => switchTab('signin'), 3000); 
+            }
+        });
+    </script>
+</body>
+</html>

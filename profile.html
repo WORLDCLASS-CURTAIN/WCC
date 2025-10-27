@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>World Class Curtain - Your Profile</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <link rel="icon" href="logoo.png" type="image/png" />
+
+    <style>
+        /* FIX: Reset default browser spacing to remove the large space at the top */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        /* Styles from index.html (hero removed) */
+        nav { position: sticky; top: 0; left: 0; right: 0; z-index: 1000; }
+        .fade-in { opacity: 0; transform: translateY(20px); transition: opacity 0.5s ease-out, transform 0.5s ease-out; }
+        .fade-in.visible { opacity: 1; transform: translateY(0); }
+        /* Add a style for the disabled full name input and button */
+        #profile-name[readonly] { background-color: #f3f4f6; cursor: not-allowed; }
+        #update-profile-btn[disabled] { cursor: not-allowed; }
+    </style>
+
+    <script type="module">
+        import { createClient } from 'https://esm.sh/@supabase/supabase-js'
+        // WARNING: Replace with your actual Supabase credentials for production
+        const SUPABASE_URL = 'https://xyvqvcfdkvvbagqxygwo.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh5dnF2Y2Zka3Z2YmFncXh5Z3dvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc3NTAzMjUsImV4cCI6MjA3MzMyNjMyNX0.y9mp2CwTpmBfeu03iQx_2khV2F3SD_xhFTih3WMoMMA';
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        window.supabase = supabase;
+    </script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { 'playfair': ['"Playfair Display"', 'serif'], 'poppins': ['Poppins', 'sans-serif'] },
+                    colors: { 'primary': '#1a1b4b', 'secondary': '#e6f3ff' }
+                }
+            }
+        };
+
+        function toggleMenu() { document.getElementById('mobile-menu').classList.toggle('hidden'); }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            // Attach mobile menu click listener
+            const menuBtn = document.getElementById('menu-btn');
+            if (menuBtn) {
+                menuBtn.addEventListener('click', toggleMenu);
+            }
+        });
+    </script>
+</head>
+<body class="font-poppins bg-secondary">
+
+    <nav class="bg-white py-4 px-6 md:px-12 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <a href="index.html" class="flex items-center text-2xl font-playfair font-bold text-primary">
+                <img src="logoo.png" alt="World Class Curtain Logo" class="h-10 mr-2">
+                World Class Curtain
+            </a>
+            
+            <div class="flex items-center space-x-4 md:hidden">
+                <a href="cart.html" class="hover:text-primary relative">
+                    <i class="fas fa-shopping-cart text-xl"></i>
+                    <span id="cart-item-count-mobile" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                </a>
+
+                <div class="">
+                    <img src="menuuu.png" alt="Menu Button" class="menu-btn cursor-pointer h-8 w-8" id="menu-btn">
+                </div>
+            </div>
+            <div class="hidden md:flex space-x-8 items-center">
+                <a href="index.html" class="hover:text-primary">HOME</a>
+                <a href="seemore.html" class="hover:text-primary">MORE</a>
+                <a href="index.html" class="hover:text-primary">ABOUT</a>
+                <a href="contact.html" class="hover:text-primary">CONTACT</a>
+                <div id="auth-links" class="flex space-x-4 items-center"></div> 
+                
+                <a href="cart.html" class="hover:text-primary relative">
+                    <i class="fas fa-shopping-cart text-xl"></i>
+                    <span id="cart-item-count-desktop" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                </a>
+            </div>
+        </div>
+        <div id="mobile-menu" class="hidden md:hidden bg-white py-4 px-6">
+            <a href="index.html" class="block hover:text-primary py-2">HOME</a>
+            <a href="seemore.html" class="block hover:text-primary py-2">MORE</a>
+            <a href="index.html" class="block hover:text-primary py-2">ABOUT</a>
+            <a href="contact.html" class="block hover:text-primary py-2">CONTACT</a>
+            <div id="mobile-auth-links" class="mt-2 space-y-1"></div> 
+        </div>
+    </nav>
+
+    <main class="py-16">
+        <div class="container mx-auto px-6 md:px-12 flex justify-center">
+            <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-2xl">
+                <h2 class="text-3xl font-playfair font-bold text-primary text-center mb-8">Manage Your Profile</h2>
+                
+                <form id="profile-form" class="mb-10">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4 border-b pb-2">Your Details</h3>
+                    <div class="mb-4">
+                        <label for="profile-email" class="block text-gray-700 font-medium mb-2">Email Address</label>
+                        <input type="email" id="profile-email" class="w-full p-3 bg-gray-100 border border-gray-300 rounded-md" readonly />
+                        <p class="text-sm text-gray-500 mt-1">Email addresses cannot be changed.</p>
+                    </div>
+                    <div class="mb-6">
+                        <label for="profile-name" class="block text-gray-700 font-medium mb-2">Full Name</label>
+                        <input type="text" id="profile-name" class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" required />
+                        <p id="name-instruction" class="text-sm text-gray-500 mt-1">You can set your name once. After it is set, it cannot be changed.</p>
+                    </div>
+                    <button type="submit" id="update-profile-btn" class="w-full bg-primary text-white py-3 rounded-md hover:bg-opacity-90 transition-colors duration-300 font-semibold">
+                        Set Full Name
+                    </button>
+                </form>
+
+                <form id="password-form">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4 border-b pb-2">Change Password</h3>
+                    <div class="mb-6">
+                        <label for="new-password" class="block text-gray-700 font-medium mb-2">New Password</label>
+                        <input type="password" id="new-password" class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" placeholder="••••••••" required />
+                    </div>
+                    <button type="submit" class="w-full bg-gray-700 text-white py-3 rounded-md hover:bg-gray-800 transition-colors duration-300 font-semibold">
+                        Update Password
+                    </button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-primary text-white py-12">
+        <div class="container mx-auto px-6 md:px-12">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="font-playfair text-xl font-bold mb-4">World Class Curtain</h3>
+                    <p class="text-gray-300">Elevate your space with our premium collection of curtains designed for modern living.</p>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-4">Quick Links</h4>
+                    <ul class="space-y-2">
+                        <li><a href="index.html" class="text-gray-300 hover:text-white">Home</a></li>
+                        <li><a href="inquiries.html" class="text-gray-300 hover:text-white">Inquiries</a></li>
+                        <li><a href="accesories.html" class="text-gray-300 hover:text-white">Accessories</a></li>
+                        <li><a href="seemore.html" class="text-gray-300 hover:text-white">More</a></li>
+                        <li><a href="contact.html" class="text-gray-300 hover:text-white">Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-300">
+                <p>&copy; 2025 World Class Curtain. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script type="module">
+        const supabase = window.supabase;
+
+        // 🔑 OWNER CONFIGURATION - Replace with the actual Owner's user ID
+        const OWNER_USER_ID = 'a07429ce-d43a-4c8f-aedf-07e06dd4ca64'; 
+
+        // --- DOM Selectors ---
+        const authLinksContainer = document.getElementById('auth-links');
+        const mobileAuthLinksContainer = document.getElementById('mobile-auth-links');
+        const cartItemCountDesktop = document.getElementById('cart-item-count-desktop'); 
+        const cartItemCountMobile = document.getElementById('cart-item-count-mobile'); 
+        
+        const profileForm = document.getElementById('profile-form');
+        const passwordForm = document.getElementById('password-form');
+        const nameInput = document.getElementById('profile-name');
+        const emailInput = document.getElementById('profile-email');
+        const newPasswordInput = document.getElementById('new-password');
+        const updateProfileBtn = document.getElementById('update-profile-btn'); 
+        const nameInstruction = document.getElementById('name-instruction'); 
+        
+        let currentUser = null; 
+
+        // --- Authentication & UI Functions (Unchanged) ---
+        function updateUIAfterAuth(session) {
+            authLinksContainer.innerHTML = '';
+            mobileAuthLinksContainer.innerHTML = '';
+            
+            const isOwner = session && session.user.id === OWNER_USER_ID;
+
+            if (session && session.user) {
+                // User is logged in
+                let adminLinkDesktop = isOwner ? `<a href="admin_orders.html" class="hover:text-red-600 font-bold text-red-500">ADMIN ORDERS</a>` : '';
+                const desktopLinks = `
+                    ${adminLinkDesktop}
+                    <a href="profile.html" class="hover:text-primary font-semibold">PROFILE</a>
+                    <button id="signout-btn" class="hover:text-primary font-semibold">SIGN OUT</button>
+                `;
+                
+                let adminLinkMobile = isOwner ? `<a href="admin_orders.html" class="block hover:text-red-600 py-2 font-bold text-red-500">ADMIN ORDERS</a>` : '';
+                const mobileLinks = `
+                    ${adminLinkMobile}
+                    <a href="profile.html" class="block hover:text-primary py-2">PROFILE</a>
+                    <button id="mobile-signout-btn" class="block hover:text-primary py-2 w-full text-left">SIGN OUT</button>
+                `;
+                
+                authLinksContainer.innerHTML = desktopLinks;
+                mobileAuthLinksContainer.innerHTML = mobileLinks;
+                
+                document.getElementById('signout-btn').addEventListener('click', handleSignOut);
+                document.getElementById('mobile-signout-btn').addEventListener('click', handleSignOut);
+
+            } else {
+                // User is not logged in
+                const desktopLinks = `<a href="login.html" class="hover:text-primary font-semibold">SIGN IN</a>`;
+                const mobileLinks = `<a href="login.html" class="block hover:text-primary py-2">SIGN IN</a>`;
+                authLinksContainer.innerHTML = desktopLinks;
+                mobileAuthLinksContainer.innerHTML = mobileLinks;
+            }
+        }
+
+        async function handleSignOut() {
+            await supabase.auth.signOut();
+            window.location.href = 'index.html'; // Redirect to home after sign out
+        }
+
+        async function updateCartCount(session) {
+            if (!session) {
+                if (cartItemCountDesktop) cartItemCountDesktop.textContent = '0';
+                if (cartItemCountMobile) cartItemCountMobile.textContent = '0';
+                return;
+            }
+            const { count, error } = await supabase
+                .from('cart')
+                .select('*', { count: 'exact', head: true })
+                .eq('user_id', session.user.id);
+            
+            const itemCount = error ? '0' : (count || '0');
+
+            if (cartItemCountDesktop) cartItemCountDesktop.textContent = itemCount;
+            if (cartItemCountMobile) cartItemCountMobile.textContent = itemCount;
+        }
+
+        // --- Core Profile Logic (Handles Irreversible Name) ---
+
+        async function initializeApp() {
+            // 1. Get user session
+            const { data: { session } } = await supabase.auth.getSession();
+            
+            // 2. Update Nav Bar & Cart
+            updateUIAfterAuth(session);
+            updateCartCount(session);
+
+            // 3. Run Profile Page Logic
+            if (!session) {
+                // If no user is logged in, redirect to login
+                alert("You must be logged in to view this page.");
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            currentUser = session.user;
+            
+            // Fetch the full name AND email address from the 'profiles' table
+            const { data: profile, error } = await supabase
+                .from('profiles')
+                .select('full_name, email_address')
+                .eq('id', currentUser.id)
+                .single();
+
+            if (error) {
+                console.warn('Error fetching profile, assuming it might be new:', error.message);
+                // Fallback: If profile doesn't exist yet, use the email from the session
+                emailInput.value = currentUser.email || '';
+            } else if (profile) {
+                // Set the email address
+                emailInput.value = profile.email_address || currentUser.email || ''; 
+
+                // Set the full name
+                nameInput.value = profile.full_name || '';
+
+                // *** IRREVERSIBLE LOGIC: Lock Full Name Field when it is set ***
+                if (profile.full_name && profile.full_name.trim().length > 0) {
+                    nameInput.setAttribute('readonly', 'readonly');
+                    updateProfileBtn.setAttribute('disabled', 'disabled');
+                    // Add Tailwind classes to visually indicate disabled state
+                    updateProfileBtn.classList.add('bg-gray-400', 'hover:bg-gray-400'); 
+                    updateProfileBtn.classList.remove('bg-primary', 'hover:bg-opacity-90');
+                    updateProfileBtn.textContent = "Full Name Set (Cannot Change)";
+                    nameInstruction.textContent = "Your full name is set and **cannot be changed**. This is enforced by the system.";
+                }
+                // *** END IRREVERSIBLE LOGIC ***
+            }
+        }
+
+        // 1. Handle IRREVERSIBLE profile name update
+        profileForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            
+            // Client-side check for already set name
+            if (nameInput.hasAttribute('readonly')) {
+                alert("Your name is already set and cannot be changed.");
+                return;
+            }
+
+            const newName = nameInput.value.trim();
+
+            if (!newName) {
+                alert('Name cannot be empty.');
+                return;
+            }
+            if (!currentUser) {
+                alert('Error: User not found.');
+                return;
+            }
+            
+            // Update the name AND the email address in one go (using email from session)
+            const { error } = await supabase
+                .from('profiles')
+                .update({ full_name: newName, email_address: currentUser.email })
+                .eq('id', currentUser.id);
+
+            if (error) {
+                // Check for RLS policy violation if the user tries to update twice
+                if (error.message.includes('policy')) {
+                     alert('Failed to update profile: Your full name has already been set and cannot be modified (Database RLS Policy Violation).');
+                } else {
+                     alert('Failed to update profile: ' + error.message);
+                }
+            } else {
+                // The name is successfully set and the 'full_name_set_irreversibly' activity is logged by the trigger.
+                alert('Full Name set successfully! It is now permanently locked and cannot be changed.');
+                // Re-initialize to lock the field after a successful set
+                initializeApp(); 
+            }
+        });
+
+        // 2. Handle REVERSIBLE password update
+        passwordForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const newPassword = newPasswordInput.value;
+
+            if (newPassword.length < 6) {
+                alert('Password must be at least 6 characters long.');
+                return;
+            }
+
+            // Supabase's updateUser handles the password change, and the trigger on auth.users will log 'password_changed'.
+            const { error } = await supabase.auth.updateUser({
+                password: newPassword
+            });
+
+            if (error) {
+                alert('Failed to update password: ' + error.message);
+            } else {
+                // The 'password_changed' activity is logged by the new trigger.
+                alert('Password updated successfully!');
+                passwordForm.reset();
+            }
+        });
+
+        // --- Initial Load ---
+        document.addEventListener('DOMContentLoaded', initializeApp);
+
+    </script>
+</body>
+</html>

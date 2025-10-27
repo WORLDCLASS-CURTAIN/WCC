@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Inquiries - World Class Curtain</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="icon" href="logoo.png" type="image/png">
+
+    <style>
+        .loading-overlay { position: fixed; inset: 0; background-color: rgba(255, 255, 255, 0.9); z-index: 2000; display: flex; justify-content: center; align-items: center; }
+        nav { position: sticky; top: 0; left: 0; right: 0; z-index: 1000; }
+        .inquiry-card { cursor: pointer; }
+    </style>
+
+    <script type="module">
+        import { createClient } from 'https://esm.sh/@supabase/supabase-js'
+
+        // --- Supabase Config (Using the existing details) ---
+        const SUPABASE_URL = 'https://xyvqvcfdkvvbagqxygwo.supabase.co'
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh5dnF2Y2Zka3Z2YmFncXh5Z3dvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc3NTAzMjUsImV4cCI6MjA3MzMyNjMyNX0.y9mp2CwTpmBfeu03iQx_2khV2F3SD_xhFTih3WMoMMA'
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+        window.supabase = supabase
+
+        // 🔑 OWNER CONFIGURATION - REPLACE THIS WITH YOUR ADMIN USER'S UUID!
+        const OWNER_USER_ID = 'a07429ce-d43a-4c8f-aedf-07e06dd4ca64';
+        window.OWNER_USER_ID = OWNER_USER_ID;
+
+        // --- Tailwind Config ---
+        tailwind.config = {
+            theme: { extend: { fontFamily: { 'playfair': ['"Playfair Display"', 'serif'], 'poppins': ['Poppins', 'sans-serif'], }, colors: { 'primary': '#1a1b4b', 'secondary': '#e6f3ff', } } }
+        }
+
+        // --- DOM Selectors (Used in Navigation/Auth) ---
+        const authLinksContainer = document.getElementById('auth-links');
+        const mobileAuthLinksContainer = document.getElementById('mobile-auth-links');
+        const userWelcomeSection = document.getElementById('user-welcome') || {};
+        const userEmailDisplay = document.getElementById('user-email-display') || {};
+        const cartItemCountDesktop = document.getElementById('cart-item-count-desktop');
+        const cartItemCountMobile = document.getElementById('cart-item-count-mobile');
+
+        // --- Main Inquiries Page DOM ---
+        const inquiryForm = document.getElementById('inquiry-form');
+        const inquiryListContainer = document.getElementById('inquiry-list-container');
+        const modal = document.getElementById('inquiry-modal');
+        const modalContent = document.getElementById('modal-content');
+
+        let currentUser = null;
+        let isOwner = false;
+
+        // --- Authentication & UI Update ---
+
+        async function checkUserSession() {
+            const { data: { session } } = await supabase.auth.getSession();
+            document.getElementById('loading-overlay').classList.add('hidden');
+
+            if (!session) {
+                alert('Please sign in to view or submit inquiries.');
+                window.location.href = 'login.html';
+                return false;
+            }
+
+            currentUser = session.user;
+            isOwner = currentUser.id === OWNER_USER_ID;
+
+            updateUIAfterAuth(session);
+            updateCartCount(session);
+
+            document.getElementById('main-content').classList.remove('hidden');
+
+            // Set up page content based on user role
+            if (isOwner) {
+                document.getElementById('admin-inquiries-title').classList.remove('hidden');
+                document.getElementById('inquiry-form-section').classList.add('hidden');
+            } else {
+                document.getElementById('user-inquiries-title').classList.remove('hidden');
+            }
+            fetchAndDisplayInquiries();
+            return true;
+        }
+
+        function updateUIAfterAuth(session) {
+            // ... (Authentication UI logic from index.html/admin_orders.html) ...
+            authLinksContainer.innerHTML = '';
+            mobileAuthLinksContainer.innerHTML = '';
+
+            if (session && session.user) {
+                if (userWelcomeSection.classList) userWelcomeSection.classList.remove('hidden');
+                if (userEmailDisplay.textContent) userEmailDisplay.textContent = `Signed in as: ${session.user.email}`;
+
+                let adminLinkDesktop = isOwner ? `<a href="admin_orders.html" class="hover:text-red-600 font-bold text-red-500">ADMIN ORDERS</a>` : '';
+                let adminLinkMobile = isOwner ? `<a href="admin_orders.html" class="block hover:text-red-600 py-2 font-bold text-red-500">ADMIN ORDERS</a>` : '';
+
+                const desktopLinks = `
+                    ${adminLinkDesktop}
+                    <a href="profile.html" class="hover:text-primary font-semibold">PROFILE</a>
+                    <button id="signout-btn" class="hover:text-primary font-semibold">SIGN OUT</button>
+                `;
+
+                const mobileLinks = `
+                    ${adminLinkMobile}
+                    <a href="profile.html" class="block hover:text-primary py-2">PROFILE</a>
+                    <button id="mobile-signout-btn" class="block hover:text-primary py-2 w-full text-left">SIGN OUT</button>
+                `;
+
+                authLinksContainer.innerHTML = desktopLinks;
+                mobileAuthLinksContainer.innerHTML = mobileLinks;
+
+                document.getElementById('signout-btn')?.addEventListener('click', handleSignOut);
+                document.getElementById('mobile-signout-btn')?.addEventListener('click', handleSignOut);
+
+            } else {
+                if (userWelcomeSection.classList) userWelcomeSection.classList.add('hidden');
+                const desktopLinks = `<a href="login.html" class="hover:text-primary font-semibold">SIGN IN</a>`;
+                const mobileLinks = `<a href="login.html" class="block hover:text-primary py-2">SIGN IN</a>`;
+                authLinksContainer.innerHTML = desktopLinks;
+                mobileAuthLinksContainer.innerHTML = mobileLinks;
+            }
+        }
+
+        async function handleSignOut() {
+            await supabase.auth.signOut();
+            window.location.href = 'index.html';
+        }
+
+        async function updateCartCount(session) {
+            const count = session ? await getCartItemCount(session.user.id) : '0';
+            if (cartItemCountDesktop) cartItemCountDesktop.textContent = count;
+            if (cartItemCountMobile) cartItemCountMobile.textContent = count;
+        }
+        
+        async function getCartItemCount(userId) {
+             const { count, error } = await supabase
+                .from('cart')
+                .select('*', { count: 'exact', head: true })
+                .eq('user_id', userId);
+            return error ? '0' : (count || '0');
+        }
+
+        // --- Core Inquiry Functionality ---
+
+        async function submitNewInquiry(e) {
+            e.preventDefault();
+            const subject = document.getElementById('subject').value;
+            const message = document.getElementById('message').value;
+
+            if (!subject || !message) {
+                alert('Please fill out both the subject and the message.');
+                return;
+            }
+
+            const { error } = await supabase
+                .from('inquiries')
+                .insert([{
+                    user_id: currentUser.id,
+                    user_email: currentUser.email,
+                    subject: subject,
+                    message: message,
+                    status: 'Open',
+                    admin_reply: null // Initialize with null
+                }]);
+
+            if (error) {
+                console.error("Error submitting inquiry:", error);
+                alert('Failed to submit inquiry. Please try again.');
+            } else {
+                alert('Your inquiry has been submitted! We will respond shortly.');
+                inquiryForm.reset();
+                fetchAndDisplayInquiries();
+            }
+        }
+
+        function createInquiryCard(inquiry) {
+            const statusColor = inquiry.status === 'Open' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800';
+            const card = document.createElement('div');
+            card.className = 'inquiry-card bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow border-l-4 border-primary';
+            card.dataset.id = inquiry.id;
+
+            card.innerHTML = `
+                <div class="flex justify-between items-center">
+                    <h3 class="font-semibold text-lg text-primary">${inquiry.subject}</h3>
+                    <span class="text-xs font-medium px-2 py-1 rounded-full ${statusColor}">${inquiry.status}</span>
+                </div>
+                <p class="text-sm text-gray-500 mt-1">Submitted: ${new Date(inquiry.created_at).toLocaleDateString()}</p>
+                ${isOwner ? `<p class="text-sm text-gray-700 mt-1">From: ${inquiry.user_email}</p>` : ''}
+                <p class="text-gray-600 mt-2 line-clamp-2">${inquiry.message}</p>
+            `;
+
+            card.addEventListener('click', () => openInquiryModal(inquiry));
+            return card;
+        }
+
+        async function fetchAndDisplayInquiries() {
+            inquiryListContainer.innerHTML = '<p class="text-center text-primary font-semibold">Loading inquiries...</p>';
+
+            let query = supabase.from('inquiries').select('*').order('created_at', { ascending: false });
+
+            // Customers only see their own inquiries
+            if (!isOwner) {
+                query = query.eq('user_id', currentUser.id);
+            }
+
+            const { data: inquiries, error } = await query;
+            inquiryListContainer.innerHTML = '';
+
+            if (error) {
+                inquiryListContainer.innerHTML = `<p class="text-center text-red-500">Error loading inquiries.</p>`;
+                console.error('Fetch inquiries error:', error);
+                return;
+            }
+
+            if (!inquiries.length) {
+                inquiryListContainer.innerHTML = `<p class="text-center text-gray-500">No inquiries found.</p>`;
+                return;
+            }
+
+            inquiries.forEach(inquiry => {
+                inquiryListContainer.appendChild(createInquiryCard(inquiry));
+            });
+        }
+
+        // --- Modal & Admin Reply Logic ---
+
+        function openInquiryModal(inquiry) {
+            const date = new Date(inquiry.created_at).toLocaleString();
+
+            let adminReplySection = '';
+            if (isOwner) {
+                // Admin View: Reply form
+                adminReplySection = `
+                    <div class="mt-6 pt-4 border-t border-gray-200">
+                        <h4 class="font-bold text-lg text-primary mb-3">Admin Reply:</h4>
+                        <textarea id="admin-reply-text" rows="4" class="w-full p-3 border border-gray-300 rounded-md focus:ring-primary focus:border-primary">${inquiry.admin_reply || ''}</textarea>
+                        <button onclick="submitAdminReply('${inquiry.id}')" class="mt-3 bg-primary text-white px-4 py-2 rounded-md hover:bg-opacity-90 transition-colors">
+                            Send Reply & Mark as Resolved
+                        </button>
+                    </div>
+                `;
+            } else {
+                // Customer View: Display reply
+                const replyText = inquiry.admin_reply
+                    ? `<p class="whitespace-pre-wrap">${inquiry.admin_reply}</p>`
+                    : `<p class="text-gray-500 italic">The administrator has not replied yet.</p>`;
+
+                adminReplySection = `
+                    <div class="mt-6 pt-4 border-t border-gray-200 bg-secondary p-4 rounded-lg">
+                        <h4 class="font-bold text-lg text-primary mb-3">Admin Response:</h4>
+                        ${replyText}
+                    </div>
+                `;
+            }
+
+
+            modalContent.innerHTML = `
+                <div class="p-6">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-2xl font-playfair font-bold text-primary">${inquiry.subject}</h3>
+                        <button onclick="closeModal()" class="text-gray-500 hover:text-gray-800 text-2xl">&times;</button>
+                    </div>
+
+                    <p class="text-sm text-gray-500 mb-4">
+                        <i class="fas fa-user mr-1"></i> ${inquiry.user_email} |
+                        <i class="fas fa-calendar mr-1"></i> ${date}
+                    </p>
+
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h4 class="font-bold text-md text-gray-700 mb-2">Original Message:</h4>
+                        <p class="whitespace-pre-wrap">${inquiry.message}</p>
+                    </div>
+
+                    ${adminReplySection}
+                </div>
+            `;
+            modal.classList.remove('hidden');
+        }
+
+        window.submitAdminReply = async (inquiryId) => {
+            const replyText = document.getElementById('admin-reply-text').value;
+
+            if (!replyText.trim()) {
+                alert('Please enter a reply before sending.');
+                return;
+            }
+
+            if (!confirm('Confirm sending reply and changing status to Resolved?')) return;
+
+            const { error } = await supabase
+                .from('inquiries')
+                .update({ admin_reply: replyText, status: 'Resolved' })
+                .eq('id', inquiryId);
+
+            if (error) {
+                console.error("Error submitting admin reply:", error);
+                alert('Failed to send reply.');
+            } else {
+                alert('Reply sent and inquiry marked as Resolved.');
+                closeModal();
+                fetchAndDisplayInquiries();
+            }
+        };
+
+        function closeModal() {
+            modal.classList.add('hidden');
+        }
+        window.closeModal = closeModal;
+
+
+        // --- Event Listeners and Initial Load ---
+        document.addEventListener('DOMContentLoaded', async () => {
+            // 1. Check user session/auth
+            if (await checkUserSession()) {
+                // 2. Setup form submission only for non-admin users
+                if (inquiryForm && !isOwner) {
+                    inquiryForm.addEventListener('submit', submitNewInquiry);
+                }
+            }
+        });
+
+        // Toggle mobile menu (copied from index.html)
+        function toggleMenu() { document.getElementById('mobile-menu').classList.toggle('hidden'); }
+    </script>
+    <script>
+        // Ensure global access for toggleMenu
+        function toggleMenu() { document.getElementById('mobile-menu').classList.toggle('hidden'); }
+    </script>
+</head>
+<body class="font-poppins bg-gray-50">
+
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="text-xl font-semibold text-primary">Checking Authorization...</div>
+    </div>
+
+    <nav class="bg-white py-4 px-6 md:px-12 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <a href="index.html" class="flex items-center text-2xl font-playfair font-bold text-primary">
+                <img src="logoo.png" alt="World Class Curtain Logo" class="h-10 mr-2">
+                World Class Curtain
+            </a>
+            <div class="flex items-center space-x-4 md:hidden">
+                <a href="cart.html" class="hover:text-primary relative">
+                    <i class="fas fa-shopping-cart text-xl"></i>
+                    <span id="cart-item-count-mobile" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                </a>
+                <div class=""><img src="menuuu.png" alt="Menu Button" class="menu-btn cursor-pointer h-8 w-8" id="menu-btn" onclick="toggleMenu()"></div>
+            </div>
+            <div class="hidden md:flex space-x-8 items-center">
+                <a href="index.html" class="hover:text-primary">HOME</a>
+                <a href="inquiries.html" class="hover:text-primary font-bold text-primary">INQUIRIES</a>
+                <a href="accesories.html" class="hover:text-primary">ACCESSORIES</a>
+                <a href="seemore.html" class="hover:text-primary">MORE</a>
+                <a href="contact.html" class="hover:text-primary">CONTACT</a>
+                <div id="auth-links" class="flex space-x-4 items-center"></div> 
+                <a href="cart.html" class="hover:text-primary relative">
+                    <i class="fas fa-shopping-cart text-xl"></i>
+                    <span id="cart-item-count-desktop" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                </a>
+            </div>
+        </div>
+        <div id="mobile-menu" class="hidden md:hidden bg-white py-4 px-6">
+            <a href="index.html" class="block hover:text-primary py-2">HOME</a>
+            <a href="inquiries.html" class="block hover:text-primary py-2 font-bold text-primary">INQUIRIES</a>
+            <a href="accesories.html" class="block hover:text-primary py-2">ACCESSORIES</a>
+            <a href="seemore.html" class="block hover:text-primary py-2">MORE</a>
+            <a href="contact.html" class="block hover:text-primary py-2">CONTACT</a>
+            <div id="mobile-auth-links" class="mt-2 space-y-1"></div> 
+        </div>
+    </nav>
+    <section id="user-welcome" class="hidden py-4 bg-secondary text-center">
+        <h2 class="text-2xl font-playfair font-bold text-primary">Welcome to Support!</h2>
+        <p id="user-email-display" class="text-gray-600"></p>
+    </section>
+
+    <main id="main-content" class="py-12 px-6 md:px-12 hidden">
+        <div class="container mx-auto max-w-4xl">
+            <h2 id="user-inquiries-title" class="hidden text-3xl font-playfair font-bold text-primary text-center mb-10">Your Support Inquiries</h2>
+            <h2 id="admin-inquiries-title" class="hidden text-3xl font-playfair font-bold text-red-600 text-center mb-10">Admin: All Customer Inquiries</h2>
+
+            <div id="inquiry-form-section" class="bg-white p-6 rounded-lg shadow-lg mb-10 border-t-4 border-primary">
+                <h3 class="text-xl font-semibold text-primary mb-4">Submit a New Inquiry</h3>
+                <form id="inquiry-form">
+                    <div class="mb-4">
+                        <label for="subject" class="block text-sm font-medium text-gray-700">Subject</label>
+                        <input type="text" id="subject" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-primary focus:border-primary" required>
+                    </div>
+                    <div class="mb-6">
+                        <label for="message" class="block text-sm font-medium text-gray-700">Message</label>
+                        <textarea id="message" rows="4" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-primary focus:border-primary" required></textarea>
+                    </div>
+                    <button type="submit" class="w-full bg-primary text-white py-2 rounded-md hover:bg-opacity-90 font-semibold transition-colors">
+                        Send Inquiry
+                    </button>
+                </form>
+            </div>
+
+            <div class="mt-8 space-y-4" id="inquiry-list-container">
+                </div>
+        </div>
+    </main>
+
+    <div id="inquiry-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-[2000] flex justify-center items-center">
+        <div class="bg-white rounded-lg shadow-2xl max-w-xl w-full mx-4 transform transition-all scale-100" id="modal-content">
+            </div>
+    </div>
+
+    <footer class="bg-primary text-white py-12">
+        <div class="container mx-auto px-6 md:px-12">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="font-playfair text-xl font-bold mb-4">World Class Curtain</h3>
+                    <p class="text-gray-300">Elevate your space with our premium collection of curtains designed for modern living.</p>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-4">Quick Links</h4>
+                    <ul class="space-y-2">
+                        <li><a href="index.html" class="text-gray-300 hover:text-white">Home</a></li>
+                        <li><a href="inquiries.html" class="text-gray-300 hover:text-white">Inquiries</a></li>
+                        <li><a href="accesories.html" class="text-gray-300 hover:text-white">Accessories</a></li>
+                        <li><a href="seemore.html" class="text-gray-300 hover:text-white">More</a></li>
+                        <li><a href="contact.html" class="text-gray-300 hover:text-white">Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-300">
+                <p>&copy; 2025 World Class Curtain. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>
